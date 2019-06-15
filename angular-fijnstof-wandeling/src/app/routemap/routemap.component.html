@@ -1,3 +1,14 @@
-<p>
-  routemap works!
-</p>
+<div class="container">
+  <div style="display: none">
+    <input id="origin-input" class="controls" type="text" (keydown.enter)="$event.preventDefault()"
+      placeholder="Enter an origin location" autocorrect="off" autocapitalize="off" spellcheck="off" type="text"
+      #originInput>
+
+    <input id="destination-input" class="controls" type="text" (keydown.enter)="$event.preventDefault()"
+      placeholder="Enter a destination location" autocorrect="off" autocapitalize="off" spellcheck="off" type="text"
+      #destinationInput>
+  </div>
+
+  <agm-map [latitude]="latitude" [longitude]="longitude" [zoom]="zoom" (mapReady)="onMapReady($event)">
+  </agm-map>
+</div>

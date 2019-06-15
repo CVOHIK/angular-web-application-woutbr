@@ -1,5 +1,8 @@
+.container {
+	height: 75%;
+}
 agm-map {
-	height: 300px;
+	height: 100%;
 	width: 80%;
 }
 html, body { height: 100%; }
