@@ -1,5 +1,7 @@
 import { Component, OnInit, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { MapsAPILoader } from '@agm/core';
+import { LuchtKwaliteitApiService } from '../lucht-kwaliteit-api.service';
+import { GeometryEnvelope } from '../geometry-envelope';
 
 @Component({
   selector: 'app-routemap',
@@ -24,8 +26,11 @@ export class RoutemapComponent implements OnInit {
   originPlaceId: string;
   destinationPlaceId: string;
 
-  constructor(private mapsAPILoader: MapsAPILoader,
-    private ngZone: NgZone) { }
+  constructor(
+    private mapsAPILoader: MapsAPILoader,
+    private ngZone: NgZone,
+    private luchtkwaliteitApi: LuchtKwaliteitApiService
+  ) { }
 
   ngOnInit() {
   }
@@ -38,10 +43,60 @@ export class RoutemapComponent implements OnInit {
       draggable: true
     });
 
+    this.setupLuchtkwaliteitLayer();
+
+    // https://developers.google.com/maps/documentation/javascript/events
+    this.map.addListener('tilesloaded', () => {
+      // Kan ook na idle event
+      this.loadDataLayer();
+    });
+
+
     this.mapsAPILoader.load().then(() => {
       this.setupRouteInput(this.originInput.nativeElement, "ORIG");
       this.setupRouteInput(this.destinationInput.nativeElement, "DEST");
     });
+  }
+
+  setupLuchtkwaliteitLayer() {
+    this.map.data.setStyle((feature) => {
+      let GRIDCODE = feature.getProperty('GRIDCODE');
+      let color = this.calculateColorFromGridcode(GRIDCODE);
+      // console.log('color: '+color);
+      return {
+        fillColor: color,
+        strokeWeight: 0,
+        strokeColor: color,
+        fillOpacity: 0.3
+      };
+    });
+  }
+
+  loadDataLayer(): void {
+    let mapBounds = this.map.getBounds();
+    if (mapBounds) {
+      let geometryEnvelop = GeometryEnvelope.createGeometryEnvelopeFromLatLngBounds(mapBounds);
+      console.log(`Load DataLayer binnen ${geometryEnvelop}`);
+      this.luchtkwaliteitApi.getLuchtkwaliteitWithinGeometry(geometryEnvelop).subscribe({
+        next: (result) => {
+          // console.log(result);
+          this.map.data.addGeoJson(result);
+        }
+      });
+    }
+  }
+
+  calculateColorFromGridcode(gridcode: number): string {
+    // gridcode: 12 tem 123, 224
+    // colorcode: rgb(0,255,0) tot rgb(255,255,0) tot rgb(255,0,0), green tot yellow tot red
+    const helftRange = (123 - 12) / 2;
+    let colorcode = Math.round((gridcode - 12 - helftRange) / helftRange * 255);
+    // console.log(`gridcode: ${gridcode}, colorcode: ${colorcode}`);
+    return "rgb(" +
+      Math.max(0, Math.min(255, 255 + colorcode))
+      + ","
+      + Math.max(0, Math.min(255, 255 - colorcode))
+      + ",0)";
   }
 
   setupRouteInput(inputElement: ElementRef["nativeElement"], mode: string) {
@@ -55,6 +110,10 @@ export class RoutemapComponent implements OnInit {
 
     // Bias the results to the map's viewport, even while that viewport changes.
     autocomplete.bindTo('bounds', this.map);
+
+    autocomplete.setComponentRestrictions({
+      country: 'be'
+    });
 
     this.setupInputPlaceChangedListener(autocomplete, mode);
   };
