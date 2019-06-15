@@ -7,6 +7,9 @@ import { AppComponent } from './app.component';
 import { AgmCoreModule } from '@agm/core';
 import { environment } from 'src/environments/environment';
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from "./material/material.module";
+
 @NgModule({
   declarations: [
     AppComponent
@@ -15,8 +18,10 @@ import { environment } from 'src/environments/environment';
     BrowserModule,
     AppRoutingModule,
     AgmCoreModule.forRoot({
-      apiKey: environment.apiKeyGMaps+"&libraries=places&libraries=visualization"
-    })
+      apiKey: environment.apiKeyGMaps + "&libraries=places&libraries=visualization"
+    }),
+    BrowserAnimationsModule,
+    MaterialModule
   ],
   providers: [],
   bootstrap: [AppComponent]
