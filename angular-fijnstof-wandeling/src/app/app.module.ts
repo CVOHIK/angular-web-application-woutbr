@@ -14,9 +14,18 @@ import { MyErrorHandler } from './my-error-handler';
 
 import { HttpClientModule } from '@angular/common/http';
 
+import { RoutemapComponent } from './routemap/routemap.component';
+import { HomeComponent } from './home/home.component';
+import { MyNavComponent } from './my-nav/my-nav.component';
+import { LayoutModule } from '@angular/cdk/layout';
+import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
+
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    RoutemapComponent,
+    HomeComponent,
+    MyNavComponent
   ],
   imports: [
     BrowserModule,
@@ -26,7 +35,13 @@ import { HttpClientModule } from '@angular/common/http';
     }),
     BrowserAnimationsModule,
     MaterialModule,
-    HttpClientModule
+    HttpClientModule,
+    LayoutModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule
   ],
   providers: [{ provide: ErrorHandler, useClass: MyErrorHandler }],
   bootstrap: [AppComponent]
