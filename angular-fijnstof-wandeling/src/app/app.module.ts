@@ -12,6 +12,8 @@ import { MaterialModule } from "./material/material.module";
 
 import { MyErrorHandler } from './my-error-handler';
 
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -23,9 +25,10 @@ import { MyErrorHandler } from './my-error-handler';
       apiKey: environment.apiKeyGMaps + "&libraries=places&libraries=visualization"
     }),
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
+    HttpClientModule
   ],
-  providers: [{provide: ErrorHandler, useClass: MyErrorHandler}],
+  providers: [{ provide: ErrorHandler, useClass: MyErrorHandler }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
