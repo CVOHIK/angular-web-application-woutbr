@@ -14,11 +14,12 @@ import { MyErrorHandler } from './my-error-handler';
 
 import { HttpClientModule } from '@angular/common/http';
 
-import { RoutemapComponent } from './routemap/routemap.component';
-import { HomeComponent } from './home/home.component';
 import { MyNavComponent } from './my-nav/my-nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
+
+import { RoutemapComponent } from './routemap/routemap.component';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,11 @@ import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, Mat
     BrowserModule,
     AppRoutingModule,
     AgmCoreModule.forRoot({
-      apiKey: environment.apiKeyGMaps + "&libraries=places&libraries=visualization"
+      apiKey: environment.apiKeyGMaps,
+      libraries: [
+        'places',
+        'visualization'
+      ]
     }),
     BrowserAnimationsModule,
     MaterialModule,
