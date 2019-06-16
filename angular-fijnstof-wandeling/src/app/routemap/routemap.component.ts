@@ -51,11 +51,24 @@ export class RoutemapComponent implements OnInit {
       this.loadDataLayer();
     });
 
-
     this.mapsAPILoader.load().then(() => {
       this.setupRouteInput(this.originInput.nativeElement, "ORIG");
       this.setupRouteInput(this.destinationInput.nativeElement, "DEST");
     });
+  }
+
+  loadDataLayer(): void {
+    let mapBounds = this.map.getBounds();
+    if (mapBounds) {
+      let geometryEnvelop = GeometryEnvelope.createGeometryEnvelopeFromLatLngBounds(mapBounds);
+      console.log(`Load DataLayer binnen ${geometryEnvelop}`);
+      this.luchtkwaliteitApi.getLuchtkwaliteitWithinGeometry(geometryEnvelop).subscribe({
+        next: (result) => {
+          console.log(result);
+          this.map.data.addGeoJson(result);
+        }
+      });
+    }
   }
 
   setupLuchtkwaliteitLayer() {
@@ -70,20 +83,6 @@ export class RoutemapComponent implements OnInit {
         fillOpacity: 0.3
       };
     });
-  }
-
-  loadDataLayer(): void {
-    let mapBounds = this.map.getBounds();
-    if (mapBounds) {
-      let geometryEnvelop = GeometryEnvelope.createGeometryEnvelopeFromLatLngBounds(mapBounds);
-      console.log(`Load DataLayer binnen ${geometryEnvelop}`);
-      this.luchtkwaliteitApi.getLuchtkwaliteitWithinGeometry(geometryEnvelop).subscribe({
-        next: (result) => {
-          // console.log(result);
-          this.map.data.addGeoJson(result);
-        }
-      });
-    }
   }
 
   calculateColorFromGridcode(gridcode: number): string {
@@ -141,7 +140,6 @@ export class RoutemapComponent implements OnInit {
     if (!this.originPlaceId || !this.destinationPlaceId) {
       return;
     }
-
     this.directionsService.route(
       {
         origin: { 'placeId': this.originPlaceId },
@@ -151,6 +149,7 @@ export class RoutemapComponent implements OnInit {
       (response, status) => {
         if (status === google.maps.DirectionsStatus.OK) {
           this.directionsDisplay.setDirections(response);
+          // this.map.data.
         } else {
           window.alert('Directions request failed due to ' + status);
         }

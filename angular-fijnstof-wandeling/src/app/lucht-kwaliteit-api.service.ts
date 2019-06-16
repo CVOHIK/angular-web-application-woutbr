@@ -25,7 +25,7 @@ export class LuchtKwaliteitApiService {
       + '&spatialRel=esriSpatialRelIndexIntersects'
       + '&outSR=4326&f=geojson';
     let url = this.arcgisUrl + this.arcgisMapNO2 + queryParams;
-    console.log(`getLuchtkwaliteitWithinGeometry( ${url} )`);
+    // console.log(`getLuchtkwaliteitWithinGeometry( ${url} )`);
     let response = this.http.get<GeoJSON>(url);
     return response;
   }

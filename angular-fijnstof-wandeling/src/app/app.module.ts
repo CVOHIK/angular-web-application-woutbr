@@ -18,15 +18,19 @@ import { MyNavComponent } from './my-nav/my-nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
 
+import { ChartsModule } from 'ng2-charts';
+
 import { RoutemapComponent } from './routemap/routemap.component';
 import { HomeComponent } from './home/home.component';
+import { ChartComponent } from './chart/chart.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RoutemapComponent,
     HomeComponent,
-    MyNavComponent
+    MyNavComponent,
+    ChartComponent
   ],
   imports: [
     BrowserModule,
@@ -46,7 +50,8 @@ import { HomeComponent } from './home/home.component';
     MatButtonModule,
     MatSidenavModule,
     MatIconModule,
-    MatListModule
+    MatListModule,
+    ChartsModule
   ],
   providers: [{ provide: ErrorHandler, useClass: MyErrorHandler }],
   bootstrap: [AppComponent]
