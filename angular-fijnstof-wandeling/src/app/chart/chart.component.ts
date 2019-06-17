@@ -22,4 +22,19 @@ export class ChartComponent implements OnInit {
   ngOnInit() {
   }
 
+  removeData(){
+    this.chart.labels.pop();
+    this.chart.datasets.forEach((dataset) => {
+        dataset.data.pop();
+    });
+    this.chart.update();
+  }
+
+  update(){
+    console.log(this.chart.data);
+    console.log(this.chart.datasets);
+    
+    this.chart.update();
+  }
+
 }

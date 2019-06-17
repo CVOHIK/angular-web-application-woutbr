@@ -191,9 +191,17 @@ export class RoutemapComponent implements OnInit {
 
   setLineChart() {
     // https://stackoverflow.com/a/24016871
-    this.lineChartData = new Array<ChartDataSets>();
+    // if (!this.lineChartData) {
+    //   this.lineChartData = new Array<ChartDataSets>();
+    // } else {
+    //   this.lineChartData.forEach((dataset) => {
+    //     dataset.data.pop();
+    //   });
+    // }
+    this.lineChartData = null;
+    // this.lineChartData = new Array<ChartDataSets>();
     let overview_path = this.directionsDisplay.getDirections().routes[0].overview_path;
-    
+    let routeData = new Array<number>();
     this.map.data.forEach((feature) => {
       let featurePoints = new Array<google.maps.LatLng>();
       // TODO Door alle LatLng loopen vormt niet dezelfde polygon. Gaten zijn er niet.
@@ -206,25 +214,25 @@ export class RoutemapComponent implements OnInit {
 
       overview_path.forEach((route_point) => {
         if (google.maps.geometry.poly.containsLocation(route_point, featurePoly)) {
-          // routeData.push(feature.getProperty('GRIDCODE'));
-          let GRIDCODE = feature.getProperty('GRIDCODE');
-          let color = this.calculateColorFromGridcode(GRIDCODE);
-          let chartPointData: ChartDataSets = {
-            data: GRIDCODE,
-            pointBorderColor: color,
-            pointBackgroundColor: color
-          };
-          console.log(chartPointData);
-          this.lineChartData.push(chartPointData);
+          routeData.push(feature.getProperty('GRIDCODE'));
+          // let GRIDCODE = feature.getProperty('GRIDCODE');
+          // let color = this.calculateColorFromGridcode(GRIDCODE);
+          // let chartPointData: ChartDataSets = {
+          //   data: GRIDCODE,
+          //   pointBorderColor: color,
+          //   pointBackgroundColor: color
+          // };
+          // // console.log(chartPointData);
+          // this.lineChartData.push(chartPointData);
         }
       });
     });
     // Set lineChartData: ChartDataSets[]
-    // this.lineChartData = [{
-    //   data: routeData,
-    //   label: 'Route'
-    // }];
-    this.lineChartLabels = Array.apply(null, { length: this.lineChartData.length }).map(Number.call, Number);
-    console.log(this.lineChartLabels);
+    this.lineChartData = [{
+      data: routeData,
+      label: 'NO2'
+    }];
+    this.lineChartLabels = Array.apply(null, { length: routeData.length }).map(Number.call, Number);
+    // console.log('lineChartLabels: ' + this.lineChartLabels);
   }
 }

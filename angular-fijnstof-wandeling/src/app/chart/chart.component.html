@@ -1,6 +1,7 @@
 <div>
+    <button (click)="update()">Click me!</button>
   <div style="display: block">
-    <canvas baseChart height="50" [datasets]="lineChartData" [labels]="lineChartLabels" [options]="lineChartOptions"
+    <canvas baseChart #baseChartEl height="50" [datasets]="lineChartData" [labels]="lineChartLabels" [options]="lineChartOptions"
       [colors]="lineChartColors" [legend]="lineChartLegend" [chartType]="lineChartType">
     </canvas>
   </div>
