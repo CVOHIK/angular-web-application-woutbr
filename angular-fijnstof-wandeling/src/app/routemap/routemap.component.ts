@@ -113,7 +113,7 @@ export class RoutemapComponent implements OnInit {
   calculateColorFromGridcode(gridcode: number): string {
     // gridcode: 12 tem 123, 224
     // colorcode: rgb(0,255,0) tot rgb(255,255,0) tot rgb(255,0,0), green tot yellow tot red
-    const helftRange = (123 - 12) / 2;
+    const helftRange = (80 - 12) / 2;
     let colorcode = Math.round((gridcode - 12 - helftRange) / helftRange * 255);
     // console.log(`gridcode: ${gridcode}, colorcode: ${colorcode}`);
     return "rgba(" +
