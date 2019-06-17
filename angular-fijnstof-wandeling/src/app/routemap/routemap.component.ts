@@ -26,8 +26,8 @@ export class RoutemapComponent implements OnInit {
   directionsService: google.maps.DirectionsService;
   directionsDisplay: google.maps.DirectionsRenderer;
 
-  originPlaceId: string;
-  destinationPlaceId: string;
+  originPlaceId: string | google.maps.LatLng;
+  destinationPlaceId: string | google.maps.LatLng;
 
   constructor(
     private mapsAPILoader: MapsAPILoader,
@@ -61,6 +61,24 @@ export class RoutemapComponent implements OnInit {
 
     this.directionsDisplay.addListener('directions_changed', () => {
       this.setLineChart();
+    });
+
+    this.map.addListener('click', (event) => {
+      console.log("Map click:" + event.latLng.lat() + " " + event.latLng.lng());
+      var marker = new google.maps.Marker({
+        position: event.latLng,
+        map: this.map
+      });
+      if (!this.originPlaceId) {
+        this.originPlaceId = event.latLng;
+        console.log("originPlaceId:" + this.originPlaceId);
+      } else if (!this.destinationPlaceId) {
+        console.log("destinationPlaceId:" + this.destinationPlaceId);
+        this.destinationPlaceId = event.latLng;
+        this.route();
+      } else {
+        // TODO add waypoints
+      }
     });
   }
 
@@ -149,8 +167,8 @@ export class RoutemapComponent implements OnInit {
     }
     this.directionsService.route(
       {
-        origin: { 'placeId': this.originPlaceId },
-        destination: { 'placeId': this.destinationPlaceId },
+        origin: this.originPlaceId instanceof google.maps.LatLng ? this.originPlaceId : { 'placeId': this.originPlaceId as string },
+        destination: this.destinationPlaceId instanceof google.maps.LatLng ? this.destinationPlaceId : { 'placeId': this.destinationPlaceId as string },
         travelMode: google.maps.TravelMode.WALKING
       },
       (response, status) => {

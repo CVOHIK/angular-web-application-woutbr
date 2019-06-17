@@ -31,6 +31,7 @@ export class ChartComponent implements OnInit {
   }
 
   update(){
+    // DEBUG
     console.log(this.chart.data);
     console.log(this.chart.datasets);
     
