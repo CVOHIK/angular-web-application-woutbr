@@ -3,7 +3,7 @@
 }
 agm-map {
 	height: 75%;
-	width: 80%;
+	width: 100%;
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

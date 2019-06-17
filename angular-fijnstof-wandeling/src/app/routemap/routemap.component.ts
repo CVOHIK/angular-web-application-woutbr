@@ -2,6 +2,9 @@ import { Component, OnInit, NgZone, ViewChild, ElementRef } from '@angular/core'
 import { MapsAPILoader } from '@agm/core';
 import { LuchtKwaliteitApiService } from '../lucht-kwaliteit-api.service';
 import { GeometryEnvelope } from '../geometry-envelope';
+import { ChartDataSets, ChartOptions } from 'chart.js';
+import { Color, Label } from 'ng2-charts';
+import { Polygon } from '@agm/core/services/google-maps-types';
 
 @Component({
   selector: 'app-routemap',
@@ -48,16 +51,20 @@ export class RoutemapComponent implements OnInit {
     // https://developers.google.com/maps/documentation/javascript/events
     this.map.addListener('tilesloaded', () => {
       // Kan ook na idle event
-      this.loadDataLayer();
+      this.loadDataLayerWithinGeometry();
     });
 
     this.mapsAPILoader.load().then(() => {
       this.setupRouteInput(this.originInput.nativeElement, "ORIG");
       this.setupRouteInput(this.destinationInput.nativeElement, "DEST");
     });
+
+    this.directionsDisplay.addListener('directions_changed', () => {
+      this.setLineChart();
+    });
   }
 
-  loadDataLayer(): void {
+  loadDataLayerWithinGeometry(): void {
     let mapBounds = this.map.getBounds();
     if (mapBounds) {
       let geometryEnvelop = GeometryEnvelope.createGeometryEnvelopeFromLatLngBounds(mapBounds);
@@ -91,11 +98,11 @@ export class RoutemapComponent implements OnInit {
     const helftRange = (123 - 12) / 2;
     let colorcode = Math.round((gridcode - 12 - helftRange) / helftRange * 255);
     // console.log(`gridcode: ${gridcode}, colorcode: ${colorcode}`);
-    return "rgb(" +
+    return "rgba(" +
       Math.max(0, Math.min(255, 255 + colorcode))
       + ","
       + Math.max(0, Math.min(255, 255 - colorcode))
-      + ",0)";
+      + ",0,1)";
   }
 
   setupRouteInput(inputElement: ElementRef["nativeElement"], mode: string) {
@@ -149,11 +156,75 @@ export class RoutemapComponent implements OnInit {
       (response, status) => {
         if (status === google.maps.DirectionsStatus.OK) {
           this.directionsDisplay.setDirections(response);
-          // this.map.data.
         } else {
           window.alert('Directions request failed due to ' + status);
         }
       });
   };
 
+  public lineChartData: ChartDataSets[]; // = [ { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A' }];
+  public lineChartLabels: Label[]; // = ['1', '2', '3', '4', '5', '6', '7'];
+  public lineChartOptions: (ChartOptions & { annotation: any }) = {
+    responsive: true,
+    scales: {
+      // We use this empty structure as a placeholder for dynamic theming.
+      xAxes: [{}],
+      yAxes: [
+        {
+          id: 'y-axis-0',
+          position: 'left',
+        }
+      ]
+    },
+    annotation: {}
+  };
+  // public lineChartColors: Color[] = [
+  //   { // grey
+  //     backgroundColor: 'rgba(148,159,177,0.2)',
+  //     borderColor: 'rgba(148,159,177,1)',
+  //     pointBackgroundColor: 'rgba(148,159,177,1)',
+  //     pointBorderColor: '#fff',
+  //     pointHoverBackgroundColor: '#fff',
+  //     pointHoverBorderColor: 'rgba(148,159,177,0.8)'
+  //   }
+  // ];
+
+  setLineChart() {
+    // https://stackoverflow.com/a/24016871
+    this.lineChartData = new Array<ChartDataSets>();
+    let overview_path = this.directionsDisplay.getDirections().routes[0].overview_path;
+    
+    this.map.data.forEach((feature) => {
+      let featurePoints = new Array<google.maps.LatLng>();
+      // TODO Door alle LatLng loopen vormt niet dezelfde polygon. Gaten zijn er niet.
+      feature.getGeometry().forEachLatLng((point) => {
+        featurePoints.push(point);
+      });
+      let featurePoly = new google.maps.Polygon({
+        paths: featurePoints
+      });
+
+      overview_path.forEach((route_point) => {
+        if (google.maps.geometry.poly.containsLocation(route_point, featurePoly)) {
+          // routeData.push(feature.getProperty('GRIDCODE'));
+          let GRIDCODE = feature.getProperty('GRIDCODE');
+          let color = this.calculateColorFromGridcode(GRIDCODE);
+          let chartPointData: ChartDataSets = {
+            data: GRIDCODE,
+            pointBorderColor: color,
+            pointBackgroundColor: color
+          };
+          console.log(chartPointData);
+          this.lineChartData.push(chartPointData);
+        }
+      });
+    });
+    // Set lineChartData: ChartDataSets[]
+    // this.lineChartData = [{
+    //   data: routeData,
+    //   label: 'Route'
+    // }];
+    this.lineChartLabels = Array.apply(null, { length: this.lineChartData.length }).map(Number.call, Number);
+    console.log(this.lineChartLabels);
+  }
 }

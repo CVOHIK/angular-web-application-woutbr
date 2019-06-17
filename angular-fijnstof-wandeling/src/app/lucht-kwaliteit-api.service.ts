@@ -29,4 +29,17 @@ export class LuchtKwaliteitApiService {
     let response = this.http.get<GeoJSON>(url);
     return response;
   }
+
+  getLuchtkwaliteitAlongRoute(geometrybox: GeometryEnvelope): Observable<GeoJSON> {
+    // TODO geometry schrijfwijze vinden voor geometryType esriGeometryPolyLine
+    let queryParams = '?where=1%3D1&outFields=*'
+      + '&geometry=' + geometrybox.toString()
+      + '&geometryType=esriGeometryEnvelope&inSR=4326'
+      + '&spatialRel=esriSpatialRelIndexIntersects'
+      + '&outSR=4326&f=geojson';
+    let url = this.arcgisUrl + this.arcgisMapNO2 + queryParams;
+    // console.log(`getLuchtkwaliteitWithinGeometry( ${url} )`);
+    let response = this.http.get<GeoJSON>(url);
+    return response;
+  }
 }

@@ -11,5 +11,6 @@
   <agm-map [latitude]="latitude" [longitude]="longitude" [zoom]="zoom" (mapReady)="onMapReady($event)">
   </agm-map>
 
-  <app-chart></app-chart>
+  <app-chart *ngIf="lineChartData" [datasets]="lineChartData" [labels]="lineChartLabels" [options]="lineChartOptions">
+  </app-chart>
 </div>
